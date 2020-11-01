@@ -20,7 +20,7 @@ function VideoDetailPage(props) {
                 } else {
                     alert('비디오 정보를 가져오는데 실패하였습니다.')
                 }
-            },[VideoDetail])
+            },[])
     })
 
     if (VideoDetail.writer){
