@@ -16,6 +16,7 @@ function VideoDetailPage(props) {
         Axios.post('/api/video/getVideoDetail', variable)
             .then(response => {
                 if(response.data.success){
+                    console.log(response.data.videoDetail)
                     setVideoDetail(response.data.videoDetail)
                 } else {
                     alert('비디오 정보를 가져오는데 실패하였습니다.')
@@ -30,7 +31,11 @@ function VideoDetailPage(props) {
             <div style ={{width: '100%', padding: '3rem 4rem'}}>
             <video style ={{width: '100%'}} src={`http://localhost:5000/${VideoDetail.filePath}`} controls/>
             <List.Item
-            actions={[<Subscribe userTo={VideoDetail.writer._id} userFrom={localStorage.getItem('userId')}/>]/* 이 부분은 Array<ReactNode>를 매개변수로 사용함 */}
+            actions={[<Subscribe 
+                        userTo={VideoDetail.writer._id} 
+                        userFrom={localStorage.getItem('userId')}
+                        />
+                    ]/* 이 부분은 Array<ReactNode>를 매개변수로 사용함 */}
             >
                 <List.Item.Meta
                     avatar ={<Avatar src ={VideoDetail.writer.image}/>}

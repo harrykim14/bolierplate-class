@@ -12,6 +12,8 @@ function Subscribe(props) {
             userTo : props.userTo
         }
 
+        
+
         Axios.post('/api/subscribe/subscribeNumber', variable)
             .then( response => {
                 if(response.data.success){
@@ -33,7 +35,7 @@ function Subscribe(props) {
                 }
             })
 
-    }, [] )
+    }, [])
 
     let onSubscribe = () => {
 
