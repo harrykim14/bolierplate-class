@@ -1,6 +1,7 @@
 import Axios from 'axios';
 import React, { useState } from 'react'
 import  { useSelector } from 'react-redux';
+import SingleComment from './SingleComment';
 
 function Comment(props) {
 
@@ -39,6 +40,7 @@ function Comment(props) {
             <hr />
 
             { /* Comment Lists */}
+            <SingleComment />
 
             { /* Root Comment Form */}
 
