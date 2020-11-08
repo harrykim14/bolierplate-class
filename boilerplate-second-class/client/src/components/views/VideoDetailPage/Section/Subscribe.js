@@ -3,48 +3,20 @@ import React, {useEffect, useState} from 'react'
 
 function Subscribe(props) {
 
+    const userTo = props.userTo;
+    const userFrom = props.userFrom
+
     const [subscribeNumbers, setsubscribeNumbers] = useState(0)
     const [Subscribed, setSubscribed] = useState(false);  
 
-    useEffect(() => {
-
-        let variable = {
-            userTo : props.userTo
-        }
-
-        
-
-        Axios.post('/api/subscribe/subscribeNumber', variable)
-            .then( response => {
-                if(response.data.success){
-                    setsubscribeNumbers(response.data.subscribeNumbers)
-                } else {
-                    alert('구독자 수 정보를 받아오지 못했습니다.')
-                }
-            })
-
-        let subVariable = { userTo: props.userTo, userFrom: localStorage.getItem('userId') }
-
-            Axios.post('/api/subscribe/subscribed', subVariable)
-            .then( response => {
-                if(response.data.success){
-                    setSubscribed(response.data.subscribed)
-                    
-                } else {
-                    alert('해당 구독 정보를 받아오지 못했습니다.')
-                }
-            })
-
-    }, [])
-
-    let onSubscribe = () => {
+    const onSubscribe = () => {
 
         let subscribeVariable = {
-            userTo: props.userTo, 
-            userFrom: props.userFrom
+            userTo: userTo, 
+            userFrom: userFrom
         }
 
-        if(Subscribed) {
+        if(Subscribed) {            
             Axios.post('/api/subscribe/unSubscribe', subscribeVariable)
                 .then(response => {
                     if(response.data.success) {
@@ -67,6 +39,37 @@ function Subscribe(props) {
         }
     }
 
+    useEffect(() => {
+
+        const subNumVariable = {
+            userTo : userTo,
+        }        
+
+        Axios.post('/api/subscribe/subscribeNumber', subNumVariable)
+            .then( response => {
+                if(response.data.success){
+                    setsubscribeNumbers(response.data.subscribeNumbers)
+                } else {
+                    alert('구독자 수 정보를 받아오지 못했습니다.')
+                }
+            })
+
+            const subscribedVariable = {
+                userTo : userTo,
+                userFrom : userFrom
+            } 
+
+        Axios.post('/api/subscribe/subscribed', subscribedVariable)
+            .then( response => {
+                if(response.data.success){
+                    setSubscribed(response.data.subscribed)
+                    
+                } else {
+                    alert('해당 구독 정보를 받아오지 못했습니다.')
+                }
+            })
+
+    }, [])
     
     return (
         <div>

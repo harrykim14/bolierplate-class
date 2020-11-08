@@ -1,5 +1,5 @@
-import React, { useState, uesEffect } from 'react'
-import { Comment, Avatar, Button, Input} from 'antd';
+import React, { useState } from 'react'
+import { Comment, Avatar } from 'antd';
 import Axios from 'axios';
 import { useSelector } from 'react-redux';
 
@@ -14,7 +14,7 @@ function SingleComment(props) {
     }
 
     const onHandleChange = (event) => {
-        setCommentValue(event.currentTarget.CommentValue);
+        setCommentValue(event.currentTarget.value);
     }
 
     const onSubmit = (event) => {
@@ -24,7 +24,7 @@ function SingleComment(props) {
             content : CommentValue,
             writer : user.userData._id,
             postId : props.postId,
-            responseTo : props.comment._id
+            responseTo : props.commentOne._id
         }
 
         Axios.post('/api/comment/saveComment', variables)
@@ -32,6 +32,7 @@ function SingleComment(props) {
                 if(response.data.success) {
                         console.log(response.data.result)
                         setCommentValue('');
+                        setOpenReply(false)
                         props.refreshComments(response.data.result)
                 } else {
                     alert('댓글 저장하지 못했습니다.')

@@ -9,17 +9,18 @@ function VideoDetailPage(props) {
 
   
     const videoId = props.match.params.videoId
-    const variable = {videoId: videoId}
 
     const [VideoDetail, setVideoDetail] = useState([])
-    const [Comments, setComments] = useState([])
+    const [CommentLists, setCommentLists] = useState([])
 
     const refreshComments = (newComments) => {
-        setComments(Comments.concat(newComments))
+        setCommentLists(CommentLists.concat(newComments))
     }
 
     useEffect(() => {
-        Axios.post('/api/video/getVideoDetail', variable)
+
+        const videoVariable = { videoId: props.match.params.videoId }
+        Axios.post('/api/video/getVideoDetail', videoVariable)
             .then(response => {
                 if(response.data.success){
                     console.log(response.data.videoDetail)
@@ -28,12 +29,13 @@ function VideoDetailPage(props) {
                     alert('비디오 정보를 가져오는데 실패하였습니다.')
                 }
             })
-
-        Axios.post('/api/comment/getComments', variable)
+        
+        const commentVariable = { videoId: props.match.params.videoId }
+        Axios.post('/api/comment/getComments', commentVariable)
             .then(response => {
                 if(response.data.success){
                     console.log(response.data.comments);
-                    setComments(response.data.comments);
+                    setCommentLists(response.data.comments);
                 } else {
                     alert('코멘트 정보 취득에 실패하였습니다.')
                 }
@@ -42,10 +44,10 @@ function VideoDetailPage(props) {
 
     if (VideoDetail.writer){
 
-        const subscribeButton = VideoDetail.writer._id !== localStorage.getItem('userId') && <Subscribe 
-        userTo={VideoDetail.writer._id} 
-        userFrom={localStorage.getItem('userId')}
-        />
+        const subscribeButton = VideoDetail.writer._id !== localStorage.getItem('userId') && 
+        <Subscribe 
+            userTo={VideoDetail.writer._id} 
+            userFrom={localStorage.getItem('userId')} />
 
     return (
         <Row gutter = {[16, 16]}>
@@ -62,7 +64,7 @@ function VideoDetailPage(props) {
                 />
 
             </List.Item>
-                <Comment refreshComments = {refreshComments} commentLists = {Comments} postId = {videoId}/>
+                <Comment refreshComments = {refreshComments} commentLists = {CommentLists} postId = {videoId}/>
             </div>
             </Col>
             <Col lg={6} xs={24}>

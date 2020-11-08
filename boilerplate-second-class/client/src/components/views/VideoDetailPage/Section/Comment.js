@@ -2,31 +2,32 @@ import Axios from 'axios';
 import React, { useState } from 'react'
 import  { useSelector } from 'react-redux';
 import SingleComment from './SingleComment';
+import ReplyComment from './ReplyComment';
 
 function Comment(props) {
 
     const user = useSelector(state => state.user)
     const videoId = props.postId
-    const [commentValue, setCommentValue] = useState('');
+    const [Comment, setComment] = useState('');
 
     const handleClickEvent = (event) => {
-        setCommentValue(event.currentTarget.value);
+        setComment(event.currentTarget.value);
     }
 
     const onSubmit = (event) => {
         event.preventDefault();
 
         const variables ={
-            content : commentValue,
+            content : Comment,
             writer : user.userData._id,
-            postId : videoId
+            postId : props.postId
         }
 
         Axios.post('/api/comment/saveComment', variables)
             .then( response => {
                 if(response.data.success) {
                         console.log(response.data.result)
-                        setCommentValue('');
+                        setComment('');
                         props.refreshComments(response.data.result)
                 } else {
                     alert('댓글 저장하지 못했습니다.')
@@ -43,7 +44,17 @@ function Comment(props) {
 
             { /* Comment Lists */}
             {props.commentLists && props.commentLists.map((comment, index) => {
-                 return (!comment.responseTo && <SingleComment refreshComments = { props.refreshComments } key = {`SingleComment-${index}`} comment = {comment} postId = {videoId} /> )
+                 return (!comment.responseTo &&
+                    <React.Fragment key ={ `Comment-${index}`}>
+                        <SingleComment refreshComments = { props.refreshComments } 
+                                       comment = {comment} postId = {videoId} 
+                                       />
+                        <ReplyComment refreshComments = { props.refreshComments } 
+                                      parentcommentId = {comment._id} 
+                                      CommentLists = {props.commentLists} postId = {videoId}
+                                    />
+                    </React.Fragment> 
+                    )
               
                 /* map메서드를 사용할 때엔 return문이 필요함!!! */
             })}            
@@ -54,7 +65,7 @@ function Comment(props) {
                 <textarea
                     style = {{ width: '89%', borderRadius : '5px', marginRight : '0.5rem', marginLeft : '0.2rem'}}
                     onChange = { handleClickEvent }
-                    value = { commentValue }
+                    value = { Comment }
                     placeholder = "코멘트를 작성해 주세요"
                 />   
                 <button

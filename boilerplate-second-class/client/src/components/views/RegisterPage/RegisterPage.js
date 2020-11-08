@@ -89,11 +89,13 @@ function RegisterPage(props) {
           values,
           touched,
           errors,
+          // eslint-disable-next-line
           dirty,
           isSubmitting,
           handleChange,
           handleBlur,
           handleSubmit,
+          // eslint-disable-next-line
           handleReset,
         } = props;
         return (
