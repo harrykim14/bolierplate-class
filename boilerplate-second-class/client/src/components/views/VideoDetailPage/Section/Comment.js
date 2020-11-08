@@ -26,6 +26,8 @@ function Comment(props) {
             .then( response => {
                 if(response.data.success) {
                         console.log(response.data.result)
+                        setCommentValue('');
+                        props.refreshComments(response.data.result)
                 } else {
                     alert('댓글 저장하지 못했습니다.')
                 }
@@ -40,7 +42,11 @@ function Comment(props) {
             <hr />
 
             { /* Comment Lists */}
-            <SingleComment />
+            {props.commentLists && props.commentLists.map((comment, index) => {
+                 return (!comment.responseTo && <SingleComment refreshComments = { props.refreshComments } key = {`SingleComment-${index}`} comment = {comment} postId = {videoId} /> )
+              
+                /* map메서드를 사용할 때엔 return문이 필요함!!! */
+            })}            
 
             { /* Root Comment Form */}
 

@@ -12,6 +12,11 @@ function VideoDetailPage(props) {
     const variable = {videoId: videoId}
 
     const [VideoDetail, setVideoDetail] = useState([])
+    const [Comments, setComments] = useState([])
+
+    const refreshComments = (newComments) => {
+        setComments(Comments.concat(newComments))
+    }
 
     useEffect(() => {
         Axios.post('/api/video/getVideoDetail', variable)
@@ -21,6 +26,16 @@ function VideoDetailPage(props) {
                     setVideoDetail(response.data.videoDetail)
                 } else {
                     alert('비디오 정보를 가져오는데 실패하였습니다.')
+                }
+            })
+
+        Axios.post('/api/comment/getComments', variable)
+            .then(response => {
+                if(response.data.success){
+                    console.log(response.data.comments);
+                    setComments(response.data.comments);
+                } else {
+                    alert('코멘트 정보 취득에 실패하였습니다.')
                 }
             })
     }, [])
@@ -47,7 +62,7 @@ function VideoDetailPage(props) {
                 />
 
             </List.Item>
-                <Comment postId = {videoId}/>
+                <Comment refreshComments = {refreshComments} commentLists = {Comments} postId = {videoId}/>
             </div>
             </Col>
             <Col lg={6} xs={24}>
