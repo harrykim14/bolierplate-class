@@ -35,15 +35,14 @@ function ReplyComment(props) {
     }
 
     const handleChange = () =>{
-        console.log(OpenReplyComments)
         setOpenReplyComments(!OpenReplyComments);
     }
 
     return (
         <div>
             { ChildCommentNumber > 0 && 
-            <p style = {{ fontSize: '14px', margin: 0, color:'gray' }} onClick={handleChange}>
-            View {ChildCommentNumber} more comment(s)
+            <p style = {{ fontSize: '14px', margin: 0, color:'gray',  }} >
+            <span style = {{ cursor : 'pointer'}} onClick={handleChange}>View {ChildCommentNumber} more comment(s)</span>
             </p>}
             
            { OpenReplyComments && 
