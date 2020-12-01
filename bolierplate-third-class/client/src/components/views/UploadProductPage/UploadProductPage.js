@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Typography, Button, Form, Input } from 'antd';
 import FileUpload from '../../utils/FileUpload';
+import Axios from 'axios';
 
 const { TextArea } = Input;
 
@@ -15,7 +16,7 @@ const Continents = [
 ]
 
 
-function UploadProductPage() {
+function UploadProductPage(props) {
 
 
     const [Title, setTitle] = useState("")
@@ -37,7 +38,42 @@ function UploadProductPage() {
     }
 
     const continentChangeHandler = (event) => {
-        setContinent(event.currentTarget.key);
+        setContinent(event.currentTarget.value);
+    }
+
+    const updateImages = (newImages) => {
+        setImages(newImages)
+    }
+
+    const submitHandler = (event) => {
+
+        console.log(Title, Description, Price, Continent, Images)
+        event.preventDefault();
+        if(!Title || !Description || !Price || !Continent || !Images){
+            return alert('모든 값을 넣어주셔야 합니다.')
+        }
+
+        const body = {
+            // 로그인 된 사람의 ID
+            writer : props.user.userData._id,
+            title: Title,
+            description: Description,
+            price: Price,
+            images: Images,
+            continents: Continent
+
+        }
+
+        // 서버에 채운 값들을 request로 보냄
+        Axios.post("/api/products/upload", body)
+        .then(response => {
+            if(response.data.success){
+                alert('상품 업로드에 성공했습니다.')
+                props.history.push('/')
+            } else {
+                alert('상품 업로드에 실패했습니다.')
+            }
+        })
     }
 
     return (
@@ -46,9 +82,9 @@ function UploadProductPage() {
                 <h2>여행 상품 업로드</h2>
             </div>
             
-            <Form>
+            <Form onSubmit = {submitHandler}>
                 {/* DropZone */}
-                <FileUpload />
+                <FileUpload refreshFunction={updateImages}/>
                 <br />
                 <br />
                     <label>이름</label>
@@ -73,11 +109,11 @@ function UploadProductPage() {
                 <br />
                 <br />
                 <select onChange={continentChangeHandler} value = {Continent}>
-                    {Continents.map(item => (<option key = {item.key} value = {Continent}>{item.value}</option>))}
+                    {Continents.map(item => (<option key = {item.key*1} value = {Continent}>{item.value}</option>))}
                 </select>
                 <br />
                 <br />
-                <Button>
+                <Button type="submit" onClick = {submitHandler}>
                     확인
                 </Button>
             </Form>
