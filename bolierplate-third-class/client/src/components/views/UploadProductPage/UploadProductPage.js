@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
-import { Typography, Button, Form, Input } from 'antd';
+import { Button, Form, Input } from 'antd';
 import FileUpload from '../../utils/FileUpload';
 import Axios from 'axios';
 
 const { TextArea } = Input;
 
 const Continents = [
-    { key: 1, value : 'Africa'},
-    { key: 2, value : 'Europe'},
+    { key: 1, value: 'Africa'},
+    { key: 2, value: 'Europe'},
     { key: 3, value: 'Asia' },
     { key: 4, value: 'North America' },
     { key: 5, value: 'South America' },
@@ -47,7 +47,6 @@ function UploadProductPage(props) {
 
     const submitHandler = (event) => {
 
-        console.log(Title, Description, Price, Continent, Images)
         event.preventDefault();
         if(!Title || !Description || !Price || !Continent || !Images){
             return alert('모든 값을 넣어주셔야 합니다.')
@@ -86,6 +85,8 @@ function UploadProductPage(props) {
                 {/* DropZone */}
                 <FileUpload refreshFunction={updateImages}/>
                 <br />
+                <div style ={{ textAlign: "center"}}>업로드용 이미지는 350px * 240px을 권장합니다</div>
+                <hr />
                 <br />
                     <label>이름</label>
                     <Input 

@@ -44,6 +44,27 @@ router.post('/image', (req, res) => {
     })
 })
 
+router.post('/products', (req, res) => {
+    // DB에 저장된 모든 정보를 가져오기
+
+    let limit = req.body.limit ? parseInt(req.body.limit) : 20;
+    let skip = req.body.skip ? parseInt(req.body.skip) : 0;
+
+    Product.find()
+    .populate("writer")
+    .skip(skip)
+    .limit(limit)
+    .exec((err, productsInfo) => {
+        if(err) return res.status(400).json({success: false, err})
+
+        return res.status(200)
+                  .json({success : true, 
+                         productsInfo, 
+                         postSize: productsInfo.length
+                        })
+    })
+})
+
 router.post('/upload', (req, res) => {
     
     //받아온 정보들을 DB에 넣어주기
