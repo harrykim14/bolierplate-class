@@ -39,6 +39,7 @@ function UploadProductPage(props) {
 
     const continentChangeHandler = (event) => {
         setContinent(event.currentTarget.value);
+        console.log(event.currentTarget.value)
     }
 
     const updateImages = (newImages) => {
@@ -60,7 +61,6 @@ function UploadProductPage(props) {
             price: Price,
             images: Images,
             continents: Continent
-
         }
 
         // 서버에 채운 값들을 request로 보냄
@@ -110,7 +110,7 @@ function UploadProductPage(props) {
                 <br />
                 <br />
                 <select onChange={continentChangeHandler} value = {Continent}>
-                    {Continents.map(item => (<option key = {item.key*1} value = {Continent}>{item.value}</option>))}
+                    {Continents.map(item => (<option key = {item.key*1} value = {item.key*1}>{item.value}</option>))}
                 </select>
                 <br />
                 <br />

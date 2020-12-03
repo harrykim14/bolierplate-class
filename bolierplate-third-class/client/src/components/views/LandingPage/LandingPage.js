@@ -3,14 +3,23 @@ import React, { useEffect, useState } from 'react'
 import { Icon, Col, Card, Row } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import ImageSlider from '../../utils/ImageSlider'
+import CheckBox from './Section/CheckBox';
+import RadioBox from './Section/RadioBox';
+import { Continents, Prices } from './Section/Datas'
 
 function LandingPage() {
 
 
     const [Products, setProducts] = useState([]);
     const [Skip, setSkip] = useState(0);
+    // eslint-disable-next-line
     const [Limit, setLimit] = useState(8);
     const [PostSize, setPostSize] = useState(0);
+    // eslint-disable-next-line
+    const [Filters, setFilters] = useState({
+        continents: [],
+        price: []
+    })
 
     useEffect(() => {
 
@@ -20,7 +29,7 @@ function LandingPage() {
         }
 
         getProducts(body)
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const getProducts = (body) => {
@@ -47,6 +56,7 @@ function LandingPage() {
         let body = {
             skip: newSkip,
             limit: Limit,
+            filters:Filters,
             loadMore: true
         } 
 
@@ -71,6 +81,48 @@ function LandingPage() {
 
     })
 
+    const showFilteredResults = (filters) => {
+
+        let body = {
+            skip : 0,
+            limit: Limit,
+            filters:filters
+        }
+
+        getProducts(body)
+        setSkip(0)
+    }
+
+    const handlePrice = (value) => {
+        const data = Prices;
+        let priceArr = [];
+
+        for (let key in data){
+            if(data[key]._id === parseInt(value, 10)){
+                priceArr = data[key].array;
+            }
+        }
+        return priceArr;
+    }
+
+    const handelFilters = (filters, category) => {
+        const newFilters = {...Filters}
+
+        if (category === "continents"){
+            newFilters[category] = filters;
+        }
+        
+        if(category === "price") {
+            let priceValue = handlePrice(filters)
+            newFilters[category] = priceValue
+        }
+        
+        console.log('filters', filters)
+
+        showFilteredResults(newFilters)
+        setFilters(newFilters)
+    }
+
 
     return (
         <div style ={{width: '75%', margin: '3rem auto'}}>
@@ -79,12 +131,27 @@ function LandingPage() {
             </div>
 
             { /* Filter */}
+            <Row gutter ={[16,16]}>
+                <Col lg = {12} xs ={24}>
+                 {/* CheckBox */}
+                    <CheckBox list ={Continents} 
+                    handleFilters={newChecked => handelFilters(newChecked, "continents")}
+                    />
+                </Col>
+                <Col lg = {12} xs ={24}>
+                 {/* RadioBox */}
+                    <RadioBox list ={Prices}
+                     handleFilters={selected => handelFilters(selected, "price")}
+                    />
+                </Col>
+            </Row>
 
             { /* Search */}
 
             { /* Cards */}
-            <Row gutter={16, 16}>
-            {renderCards}
+            <Row gutter={[16, 16]}>
+            {(Products.length > 0) ? renderCards
+                                   : <React.Fragment><div style={{textAlign:'center', marginTop: '10vh'}}>No Data for display</div></React.Fragment>}
             </Row>
             {PostSize >= Limit &&
             <div style = {{display: 'flex', justifyContent: 'center', margin: '1rem'}}>
