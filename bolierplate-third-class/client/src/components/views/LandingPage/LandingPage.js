@@ -5,6 +5,7 @@ import Meta from 'antd/lib/card/Meta';
 import ImageSlider from '../../utils/ImageSlider'
 import CheckBox from './Section/CheckBox';
 import RadioBox from './Section/RadioBox';
+import SearchFeature from './Section/SearchFeature';
 import { Continents, Prices } from './Section/Datas'
 
 function LandingPage() {
@@ -15,11 +16,12 @@ function LandingPage() {
     // eslint-disable-next-line
     const [Limit, setLimit] = useState(8);
     const [PostSize, setPostSize] = useState(0);
-    // eslint-disable-next-line
     const [Filters, setFilters] = useState({
         continents: [],
         price: []
     })
+    // eslint-disable-next-line
+    const [SearchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
 
@@ -123,6 +125,20 @@ function LandingPage() {
         setFilters(newFilters)
     }
 
+    const updateSearchTerm = (newSearchTerm) => {
+
+        let body = {
+            skip:0,
+            limit:Limit,
+            flters:Filters,
+            searchTerm: newSearchTerm
+        }
+
+        setSkip(0)
+        setSearchTerm(newSearchTerm)
+        getProducts(body);
+    }
+
 
     return (
         <div style ={{width: '75%', margin: '3rem auto'}}>
@@ -147,7 +163,9 @@ function LandingPage() {
             </Row>
 
             { /* Search */}
-
+            <div stlye = {{ display:'flex', flexFlow: 'row wrap', alignItems:'flex-end', margin:'2px auto' }}>
+                <SearchFeature refreshFunction = {updateSearchTerm} />
+            </div>
             { /* Cards */}
             <Row gutter={[16, 16]}>
             {(Products.length > 0) ? renderCards
