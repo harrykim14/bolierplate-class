@@ -71,7 +71,9 @@ function LandingPage() {
         return <Col lg={6} md= {8} sm={12} xs={24} key = {index}>
         <Card 
         cover={
+            <a href={`/product/${product._id}`}>
             <ImageSlider image={product.images} />
+            </a>
         }
         >
             <Meta 
