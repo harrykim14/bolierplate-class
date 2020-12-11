@@ -115,13 +115,17 @@ router.get('/products_by_id', (req, res) => {
 
     //productId로 DB에서 정보 가져오기
     let type = req.query.type;
-    let productId = req.query.id;
+    let productIds = req.query.id;
 
-    Product.find({ _id : productId})
+    if (type === "array") {
+        productIds = req.query.id.split(',')
+    }
+
+    Product.find({ _id : {$in : productIds}})
     .populate('writer')
     .exec((err, product) => {
         if(err) return res.status(400).send(err)
-        return res.status(200).send({success: true, product})
+        return res.status(200).json({success: true, product})
     })
 
 })
