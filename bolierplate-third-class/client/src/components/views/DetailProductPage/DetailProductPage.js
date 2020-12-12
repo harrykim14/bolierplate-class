@@ -13,12 +13,9 @@ function DetailProductPage(props) {
     useEffect(() => {
         Axios.get(`/api/products/products_by_id?id=${productId}&type=single`)
              .then(response => {
-                 if(response.data.success){
-                    setProductObj(response.data.product[0])
-                 } else {
-                     alert('상세 정보 가져오기를 실패했습니다.')
-                 }
+                setProductObj(response.data[0])
              })
+             .catch(err => alert(err))
          // eslint-disable-next-line
     }, [])
 
