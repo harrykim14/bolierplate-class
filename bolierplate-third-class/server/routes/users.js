@@ -4,6 +4,7 @@ const { User } = require("../models/User");
 
 const { auth } = require("../middleware/auth");
 const { response } = require('express');
+const { Product } = require('../models/Product');
 
 //=================================
 //             User
@@ -114,6 +115,34 @@ router.post("/addToCart", auth, (req, res) => {
                 )
             }
     })
+})
+
+router.get('/removeFromCart', auth, (req, res) => {
+    // 카트 안에서 상품 하나 지움
+    User.findOneAndUpdate(
+        {_id : req.user._id},
+        {
+            "$pull" : {
+                "cart" : { "id" : req.query.id }
+            }
+        },
+        { new : true},
+        (err, userInfo) => {
+            let cart = userInfo.cart;
+            let array = cart.map(item => {
+                return item.id
+            })
+
+        // product collection에서 남아있는 상품 정보를 불러오기
+        Product.find({_id: { $in: array }})
+            .populate("writer")
+            .exec((err, productInfo) => {
+                return res.status(200).json({ productInfo, cart}) 
+        })
+
+        }
+    )
+    
 })
 
 module.exports = router;
