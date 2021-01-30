@@ -1,9 +1,8 @@
-import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-import ChatPage from './components/ChatPage'
-import LoginPage from './components/LoginPage'
-import RegisterPage from './components/RegisterPage'
+import ChatPage from './components/ChatPage/ChatPage'
+import LoginPage from './components/LoginPage/LoginPage'
+import RegisterPage from './components/RegisterPage/RegisterPage'
 
 function App() {
   return (
