@@ -24,3 +24,6 @@ yarn-error.log*
 
 # hide firebase config
 firebase.js
+
+# cache
+.eslintcache
