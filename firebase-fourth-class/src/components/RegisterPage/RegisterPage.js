@@ -12,7 +12,7 @@ function RegisterPage() {
     const [loading, setLoading] = useState(false);
     const password = useRef();
     password.current = watch("password");
-    console.log(watch("email"))
+    // console.log(watch("email"))
 
     const onSubmit = async (data) => {
         try {
@@ -26,6 +26,11 @@ function RegisterPage() {
                 photoURL:`http://gravatar.com/avatar/${md5(createUser.user.email)}?d=identicon`
             })
 
+            await firebase.database().ref("users").child(createUser.user.uid).set({
+                name: createUser.user.displayName,
+                image: createUser.user.photoURL
+            })
+
             setLoading(false)
 
         } catch (error) {
@@ -36,6 +41,7 @@ function RegisterPage() {
             }, 5000)
         }
     }
+
 
     return (
     <div className="regist">
