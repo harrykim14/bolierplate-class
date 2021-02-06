@@ -1,5 +1,6 @@
 import {
-    SET_USER
+    SET_USER,
+    CLEAR_USER
 } from '../actions/types';
 
 const initialUserState = {
@@ -7,6 +8,7 @@ const initialUserState = {
     isLoading: true
 }
 
+// eslint-disable-next-line
 export default function (state = initialUserState, action) {
     switch(action.type) {
         case SET_USER:
@@ -15,6 +17,13 @@ export default function (state = initialUserState, action) {
                 currentUser: action.payload,
                 isLoading: false
                 }
+
+        case CLEAR_USER:
+            return {
+                ...state,
+                currentUser: null,
+                isLoading: false
+            }
              
         default:
              return state;

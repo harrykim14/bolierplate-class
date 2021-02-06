@@ -1,12 +1,13 @@
 import './App.css';
 import React, { useEffect } from 'react'
+ // eslint-disable-next-line
 import { Switch, Route, Link, useHistory } from 'react-router-dom';
 import ChatPage from './components/ChatPage/ChatPage'
 import LoginPage from './components/LoginPage/LoginPage'
 import RegisterPage from './components/RegisterPage/RegisterPage'
 import firebase from './firebase';
 import { useDispatch, useSelector } from 'react-redux'; 
-import { setUser } from './redux/actions/user_action';
+import { setUser, clearUser } from './redux/actions/user_action';
 
 function App() {
 
@@ -24,8 +25,10 @@ function App() {
         dispatch(setUser(user));
       } else {
         history.push("/login");
+        dispatch(clearUser());
       }
     })
+     // eslint-disable-next-line
   }, [])
 
   if (isLoading) {
@@ -37,9 +40,9 @@ function App() {
   } else {
     return (
       <Switch>
-        <Route exact path="/login" component={LoginPage} />
+        <Route exact path="/"       component={ChatPage} />
+        <Route exact path="/login"  component={LoginPage} />
         <Route exact path="/regist" component={RegisterPage} />
-        <Route exact path="/" component={ChatPage} />
       </Switch>
   );
   }  
