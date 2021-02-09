@@ -1,0 +1,20 @@
+.chatBt {
+  background: #7A84EB;
+  color: white;
+  text-transform: uppercase;
+  border: none;
+  margin-top: 40px;
+  padding: 20px;
+  font-size: 16px;
+  font-weight: 100;
+  letter-spacing: 10px;
+  
+}
+
+.chatBt:hover {
+  background: #636ee6;
+}
+
+textarea {
+  width: 100%;
+}
