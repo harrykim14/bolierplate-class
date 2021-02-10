@@ -12,7 +12,10 @@ export class MainPanel extends Component {
     state = {
         messages: [],
         messagesRef: firebase.database().ref("messages"),
-        messagesLoading: true
+        messagesLoading: true,
+        searchTerm: "",
+        searchResults: [],
+        searchLoading: false
     }
 
     componentDidMount() {
@@ -22,6 +25,29 @@ export class MainPanel extends Component {
         if(chatRoom){
             this.addMessagesListeners(chatRoom.id);
         }
+    }
+
+    handleSearchMessages = () => {
+        const chatRoomMessages = [...this.state.messages];
+        const regex = new RegExp(this.state.searchTerm, "gi");
+        const results = chatRoomMessages.reduce((acc, message) => {
+            if(
+                (message.content && message.content.match(regex)) || 
+                message.user.name.match(regex)
+            ) acc.push(message)
+            return acc;
+        }, [])
+
+        this.setState({ searchResults : results })
+    }
+
+    handleSearchChange = e => {
+        this.setState({
+            searchTerm: e.target.value,
+            searchLoading: true
+        },
+        () => this.handleSearchMessages()
+        )
     }
 
     addMessagesListeners = (chatRoomId) => {
@@ -46,10 +72,10 @@ export class MainPanel extends Component {
 
     render() {
 
-        const { messages } = this.state;
+        const { messages, searchTerm, searchResults } = this.state;
         return (
             <div style = {{ padding: '2rem 2rem 0 2rem'}}>
-                <MessageHeader />
+                <MessageHeader handleSearchChange={this.handleSearchChange} />
                 <div style = {{
                     width: '100%',
                     height: '400px',
@@ -59,9 +85,11 @@ export class MainPanel extends Component {
                     marginBottom: '1rem',
                     overflowY: 'auto'
                 }}>
-                    {this.renderMessages(messages)}
+
+                    {searchTerm ? this.renderMessages(searchResults) : this.renderMessages(messages)}
+
                 </div>
-                <MessageForm />
+                <MessageForm handleSearchChange={this.handleSearchChange} />
             </div>
         )
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { useSelector } from 'react-redux';
 
 // react-bootstrap
@@ -7,7 +7,8 @@ import ProgressBar from 'react-bootstrap/ProgressBar'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-
+// mime-types module for upload file
+import mime from 'mime-types';
 
 // load firbase
 import firebase from '../../../firebase';
@@ -24,8 +25,12 @@ function MessageForm() {
     const [content, setContent] = useState("")
     const [errors, setErrors] = useState([])
     const [loading, setLoading] = useState(false)
+    const [percentage, setPercentage] = useState(0);
+
+    const inputOpenImageRef = useRef();
 
     const messagesRef = firebase.database().ref("messages")
+    const storageRef = firebase.storage().ref();
     const createMessage = (fileURL = null) => {
 
         const message = {
@@ -74,6 +79,48 @@ function MessageForm() {
         setContent(e.target.value);
     }
 
+    const handleOpenImageRef = () => {
+        inputOpenImageRef.current.click();
+    }
+
+    const handleUploadImage = (e) => {
+        const file = e.target.files[0];
+        console.log("file", file);
+        if(!file) return;
+        const filePath = `message/public/${file.name}.jpg`;
+        const metadata = { contentType: mime.lookup(file.name)}
+        setLoading(true)
+        try {
+            let uploadTask = storageRef.child(filePath).put(file, metadata)
+            
+            uploadTask.on("state_changed", 
+            UploadTaskSnapshot => {
+                const percentage = Math.round(
+                    (UploadTaskSnapshot.bytesTransferred / UploadTaskSnapshot.totalBytes) * 100
+                );
+                setPercentage(percentage)
+            },
+            error => {
+                console.log(error)
+                setLoading(false)
+            },
+            () => {
+                // 저장이 다 되면 파일 메세지 전송
+                // 저장된 파일을 다운로드 받을 수 있는 URL 가져오기
+                uploadTask.snapshot.ref.getDownloadURL()
+                .then(downloadURL => {
+                    console.log("downloadURL", downloadURL);
+                    messagesRef.child(chatRoom.id).push().set(createMessage(downloadURL))
+                    setLoading(false)
+                })
+            }
+
+        )
+        } catch (err) {
+            alert(err)
+        }
+    }
+
     return (
         <div>
             <Form onSubmit={handleSubmit}>
@@ -86,7 +133,7 @@ function MessageForm() {
                 </Form.Group>
             </Form>
 
-            <ProgressBar variant="warning" label="60%" now={60} />
+            {(percentage !== 0 && percentage !== 100) && <ProgressBar variant="warning" label={`${percentage}%`} now={percentage} /> }
 
         <div>
             {errors.map(errMsg => <p style={{ color: "red" }} key={errMsg}>{errMsg}</p>)}
@@ -103,11 +150,18 @@ function MessageForm() {
                 <Col>
                 <button className="chatBt" 
                         style={{ width: '100%' }} 
+                        onClick={handleOpenImageRef}
                         disabled={loading ? true : false}>
                     이미지 보내기
                 </button>
                 </Col>
             </Row>
+            <input 
+                accept="image/jpeg, image/png"
+                type="file" style={{display:"none"}}
+                onChange={handleUploadImage}
+                ref={inputOpenImageRef}
+            />
         </div>
     )
 }
