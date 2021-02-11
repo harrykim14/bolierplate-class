@@ -52,8 +52,8 @@ export class MainPanel extends Component {
 
     addMessagesListeners = (chatRoomId) => {
         let msgArr = [];
-        this.state.messagesRef.child(chatRoomId).on("child_added", DataSnpashot => {
-            msgArr.push(DataSnpashot.val());
+        this.state.messagesRef.child(chatRoomId).on("child_added", DataSnapshot => {
+            msgArr.push(DataSnapshot.val());
             this.setState({ 
                 messages: msgArr,
                 messagesLoading: false
@@ -62,13 +62,14 @@ export class MainPanel extends Component {
         })
     }
 
-    renderMessages = (messages) => messages.length > 0 && messages.map(message => (
-        <Message 
-            key={message.timestamp}
-            message={message}
-            user={this.props.user}
-        />
-    ))
+    renderMessages = (messages) => 
+        messages.length > 0 && 
+        messages.map(message => (
+            <Message 
+                key={message.timestamp}
+                message={message}
+                user={this.props.user}
+            />))
 
     render() {
 

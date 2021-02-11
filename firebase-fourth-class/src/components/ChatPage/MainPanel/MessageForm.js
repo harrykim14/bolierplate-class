@@ -20,6 +20,7 @@ import "./style.css";
 function MessageForm() {
 
     const chatRoom = useSelector(state => state.chatRoom.currentChatRoom)
+    const isPrivateChatRoom = useSelector(state => state.chatRoom.isPrivateChatRoom)
     const user = useSelector(state => state.user.currentUser)
 
     const [content, setContent] = useState("")
@@ -83,11 +84,19 @@ function MessageForm() {
         inputOpenImageRef.current.click();
     }
 
+    const getPath = () => {
+        if(isPrivateChatRoom) {
+            return `/message/private/${chatRoom.id}`
+        } else {
+            return `/message/public`
+        }
+    }
+
     const handleUploadImage = (e) => {
         const file = e.target.files[0];
         console.log("file", file);
         if(!file) return;
-        const filePath = `message/public/${file.name}.jpg`;
+        const filePath = `${getPath()}/${file.name}.jpg`;
         const metadata = { contentType: mime.lookup(file.name)}
         setLoading(true)
         try {
@@ -126,10 +135,13 @@ function MessageForm() {
             <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="exampleForm.ControlTextarea1">
                     <Form.Control 
+                        className="chatTextarea"
                         value={content}
                         onChange={handleChange}
-                        style={{width: "100%"}}
-                        as="textarea" rows={3} />
+                        style={{
+                            display: 'flex', width: "100%", border: "0px none", resize: "none"
+                        }}
+                        as="textarea" rows={2} />
                 </Form.Group>
             </Form>
 

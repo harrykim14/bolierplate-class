@@ -1,4 +1,5 @@
 import React from 'react'
+import { useSelector } from 'react-redux';
 
 // react-bootstrap
 import Container from 'react-bootstrap/Container';
@@ -12,11 +13,14 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 
 // react-icons
-import { FaLock } from 'react-icons/fa';
+import { FaLock, FaLockOpen } from 'react-icons/fa';
 import { MdFavorite } from 'react-icons/md';
 import { AiOutlineSearch }  from 'react-icons/ai';
 
 function MessageHeader({handleSearchChange}) {
+
+    const chatRoom = useSelector(state => state.chatRoom.currentChatRoom)
+    const isPrivateChatRoom = useSelector(state => state.chatRoom.isPrivateChatRoom);
 
     return (
         <div style={{ width: '100%', height: '170px', 
@@ -25,7 +29,9 @@ function MessageHeader({handleSearchChange}) {
             <Container>
                 <Row>
                     <Col>
-                        <h2><FaLock/> ChatRoomName <MdFavorite/></h2>
+                        <h2>
+                            {isPrivateChatRoom ? <FaLock style={{margin: '0px 5px 10px 0px'}}/> : <FaLockOpen style={{margin: '0px 5px 10px 0px'}}/> }
+                            {chatRoom && chatRoom.title} <MdFavorite style={{marginBottom: '10px'}}/></h2>
                     </Col>
                     <Col>
                     <InputGroup className="mb-3">

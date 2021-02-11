@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form'
 import { connect } from 'react-redux';
 import firebase from '../../../firebase';
-import { setCurrentChatRoom } from '../../../redux/actions/chat_action'
+import { setCurrentChatRoom, setPrivateChatRoom } from '../../../redux/actions/chat_action'
 
 export class ChatRooms extends Component {
 
@@ -33,7 +33,6 @@ export class ChatRooms extends Component {
             chatRoomsArray.push(DataSnapshot.val());
             this.setState({ chatRooms: chatRoomsArray}, 
                             () => this.setFirstChatRoom())
-            console.log('chatRoomsArray', chatRoomsArray)
         })
     }
 
@@ -90,19 +89,20 @@ export class ChatRooms extends Component {
 
     changeChatRoom = (room) => {
         this.props.dispatch(setCurrentChatRoom(room))
+        this.props.dispatch(setPrivateChatRoom(false))
         this.setState({ activeChatRoomId: room.id })
     }
 
     renderChatRooms = (chatRooms) => (
         chatRooms.length > 0 &&
-        chatRooms.map(room => 
+        chatRooms.map(room => (
             <li key={room.id}
                 onClick={() => this.changeChatRoom(room)}
                 style={{ backgroundColor: room.id === this.state.activeChatRoomId && "#ffffff45", cursor:'pointer'}}
             >
                 # {room.title}
             </li>
-        )
+        ))
     )
 
     render() {
@@ -116,7 +116,7 @@ export class ChatRooms extends Component {
                 </div>
 
                 <ul style={{ listStyleType: 'none', padding: 0 }}>
-                {(this.state.chatRooms.length > 0) ? this.renderChatRooms(this.state.chatRooms) : `채팅방 없음`}
+                    {this.renderChatRooms(this.state.chatRooms)}
                 </ul>
 
                 <Modal show={this.state.show} onHide={this.handleClose} >
@@ -156,7 +156,8 @@ export class ChatRooms extends Component {
 
 const mapStateToProps = state => {
     return {
-        user: state.user.currentUser
+        user: state.user.currentUser,
+        chatRoom: state.chatRoom.currentChatRoom
     }
 }
 

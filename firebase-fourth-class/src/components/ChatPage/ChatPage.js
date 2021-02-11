@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 
 function ChatPage() {
     const currentUser = useSelector(state => state.user.currentUser)
-    const chatRoomId = useSelector(state => state.chatRoom.currentChatRoom)
+    const currentChatRoom = useSelector(state => state.chatRoom.currentChatRoom)
 
     return (
         <div style={{ display:'flex' }}>
@@ -17,7 +17,7 @@ function ChatPage() {
             </div>
             <div style={{ width:'100%' }}>
                 <MainPanel
-                    key={chatRoomId}
+                    key={currentChatRoom && currentChatRoom.id}
                 />
             </div>
         </div>
