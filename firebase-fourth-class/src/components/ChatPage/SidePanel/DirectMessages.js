@@ -20,6 +20,15 @@ export class DirectMessages extends Component {
             this.addUsersListeners(this.props.user.uid)
     }
 
+    componentWillUnmount() {
+        if(this.props.user) 
+            this.removeListener(this.props.user.uid);
+    }
+
+    removeListener = userId => {
+        this.state.usersRef.child(`${userId}/favorited`).off();
+    }
+
     addUsersListeners = (currentUserId) => {
         const { usersRef } = this.state;
         let usersArr = [];
@@ -70,7 +79,7 @@ export class DirectMessages extends Component {
         return (
             <div>
                 <span style={{ display: 'flex', alignItems: 'center'}}>
-                    <FaRegSmile style={{ marginRight: '3px' }}/> DIRECT MESSAGES(1)
+                    <FaRegSmile style={{ marginRight: '3px' }}/> DIRECT MESSAGES
                 </span>
 
                 <ul style={{ listStyleType:'none', padding: 0 }}>

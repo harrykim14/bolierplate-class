@@ -3,6 +3,7 @@ import { FaRegSmileWink, FaPlus } from 'react-icons/fa';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form'
+import Badge from 'react-bootstrap/Badge';
 import { connect } from 'react-redux';
 import firebase from '../../../firebase';
 import { setCurrentChatRoom, setPrivateChatRoom } from '../../../redux/actions/chat_action'
@@ -15,8 +16,10 @@ export class ChatRooms extends Component {
          description: "",
          chatRooms: [],
          chatRoomsRef: firebase.database().ref("chatRooms"),
+         messagesRef: firebase.database().ref("messages"),
          firstLoad: true,
-         activeChatRoomId: ""
+         activeChatRoomId: "",
+         notifications:[]
     }
 
     componentDidMount() {
@@ -25,15 +28,64 @@ export class ChatRooms extends Component {
 
     componentWillUnmount() {
         this.state.chatRoomsRef.off();
+        this.state.chatRooms.forEach(chatRoom => {
+            this.state.messagesRef.child(chatRoom.id).off();
+        })
     }
 
     AddChatRoomsListeners = () => {
         let chatRoomsArray = [];
         this.state.chatRoomsRef.on("child_added", DataSnapshot => {
             chatRoomsArray.push(DataSnapshot.val());
-            this.setState({ chatRooms: chatRoomsArray}, 
+            this.setState({ chatRooms: chatRoomsArray }, 
                             () => this.setFirstChatRoom())
+            this.addNotificationListener(DataSnapshot.key)
         })
+    }
+
+    addNotificationListener = (chatRoomId) => {
+        const { messagesRef } = this.state;
+        messagesRef.child(chatRoomId).on("value", DataSnapshot => {
+            if(this.props.chatRoom) {
+                this.handleNotification(
+                    chatRoomId,
+                    this.props.chatRoom.id,
+                    this.state.notifications,
+                    DataSnapshot
+                )
+            }
+        })
+    }
+
+    handleNotification = (chatRoomId, currentChatRoomId, notifications, DataSnapshot) => {
+
+        // 이미 notifications state 안에 알림 정보가 들어있는 채팅방과 그렇지않은 채팅방을 나눠주기
+        // 새로 방을 만들면 notification handler가 catch하지 못함 (새로 생성된 component이므로)
+        let index = notifications.findIndex(notification => notification.id === chatRoomId)
+        let lastTotal = 0;
+
+        if (index === -1) {
+            notifications.push({
+                id: chatRoomId,
+                total: DataSnapshot.numChildren(), // 모든 메세지 갯수
+                lastKnownTotal: DataSnapshot.numChildren(), // notification에 없는 경우엔 모든 메세지를 열람한 경우이므로 total 값과 같을 것
+                count: 0,
+            })
+        } else {
+            // 받은 채팅이 현재 열린 채팅방과 다를 때
+            if (chatRoomId !== currentChatRoomId) {
+                // 유저가 확인한 총 메시지 개수
+                lastTotal = notifications[index].lastKnownTotal;
+                // 총 메세지 개수 > 0 이어야 함
+                if(DataSnapshot.numChildren() - lastTotal > 0) {
+                    notifications[index].count = DataSnapshot.numChildren() - lastTotal;
+                } 
+            } 
+            // total property
+            notifications[index].total = DataSnapshot.numChildren();
+        }
+
+        this.setState({ notifications })
     }
 
     setFirstChatRoom = () => {
@@ -89,8 +141,31 @@ export class ChatRooms extends Component {
 
     changeChatRoom = (room) => {
         this.props.dispatch(setCurrentChatRoom(room))
-        this.props.dispatch(setPrivateChatRoom(false))
         this.setState({ activeChatRoomId: room.id })
+        this.props.dispatch(setPrivateChatRoom(false))
+        this.clearNotification()
+    }
+
+    getNotificationCount = room => {
+        let count = 0;
+        this.state.notifications.forEach(notification => {
+            if(notification.id === room.id) {
+                count = notification.count;
+            }
+        })
+
+        if (count > 0) return count;
+    }
+
+    clearNotification = () => {
+        let index = this.state.notifications.findIndex(notification => notification.id === this.props.chatRoom.id)
+
+        if(index !== -1) {
+            let updatedNotifications = [...this.state.notifications];
+            updatedNotifications[index].lastKnownTotal = this.state.notifications[index].total;
+            updatedNotifications[index].count = 0;
+            this.setState({ notifications: updatedNotifications });
+        }
     }
 
     renderChatRooms = (chatRooms) => (
@@ -101,6 +176,10 @@ export class ChatRooms extends Component {
                 style={{ backgroundColor: room.id === this.state.activeChatRoomId && "#ffffff45", cursor:'pointer'}}
             >
                 # {room.title}
+
+                <Badge variant="danger" style={{float:'right', marginTop: '4px'}}>
+                    {this.getNotificationCount(room)}
+                </Badge>
             </li>
         ))
     )
