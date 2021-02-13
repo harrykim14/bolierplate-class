@@ -30,7 +30,8 @@ function MessageForm() {
 
     const inputOpenImageRef = useRef();
 
-    const messagesRef = firebase.database().ref("messages")
+    const messagesRef = firebase.database().ref("messages");
+    const typingRef = firebase.database().ref("typing");
     const storageRef = firebase.storage().ref();
     const createMessage = (fileURL = null) => {
 
@@ -63,6 +64,8 @@ function MessageForm() {
 
         try {
             await messagesRef.child(chatRoom.id).push().set(createMessage())
+            typingRef.child(chatRoom.id).child(user.uid).remove();
+
             setLoading(false)
             setContent("")
             setErrors([])
@@ -130,6 +133,22 @@ function MessageForm() {
         }
     }
 
+    const handleKeyDown = e => {
+        if(e.ctrlKey && e.keyCode === 13) {
+            handleSubmit();
+        }
+
+        if(content) {
+            typingRef.child(chatRoom.id)
+                     .child(user.uid)
+                     .set(user.displayName);
+        } else {
+            typingRef.child(chatRoom.id)
+                     .child(user.uid)
+                     .remove();
+        }
+    }
+
     return (
         <div>
             <Form onSubmit={handleSubmit}>
@@ -138,6 +157,7 @@ function MessageForm() {
                         className="chatTextarea"
                         value={content}
                         onChange={handleChange}
+                        onKeyDown={handleKeyDown}
                         style={{
                             display: 'flex', width: "100%", border: "0px none", resize: "none"
                         }}

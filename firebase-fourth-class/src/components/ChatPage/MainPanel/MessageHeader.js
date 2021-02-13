@@ -19,12 +19,14 @@ import { AiOutlineSearch }  from 'react-icons/ai';
 
 // firebase
 import firebase from '../../../firebase'
+import Media from 'react-bootstrap/esm/Media';
 
 function MessageHeader({handleSearchChange}) {
 
     const user = useSelector(state=> state.user.currentUser)
     const chatRoom = useSelector(state => state.chatRoom.currentChatRoom)
     const isPrivateChatRoom = useSelector(state => state.chatRoom.isPrivateChatRoom);
+    const userPosts = useSelector(state => state.chatRoom.userPosts);
     const [isFavorited, setIsFavorited] = useState(false);
     const usersRef = firebase.database().ref("users");
 
@@ -76,6 +78,22 @@ function MessageHeader({handleSearchChange}) {
 
     }
 
+    const renderUserPosts = userPosts => {
+        return Object.entries(userPosts) // 객체를 오브젝트 배열로 
+            .sort((a, b) => b[1].count - a[1].count) // count값에 따라 sort
+            .map(([key, val], i) => (
+                <Media key={i}>
+                    <img style={{ width:'48px', height: '48px', borderRadius: 25 }} className="mr-3" src={val.image} alt={val.name}/>
+                    <Media.Body>
+                        <h6>{key}</h6>
+                        <p>
+                            {val.count} 개
+                        </p>
+                    </Media.Body>
+                </Media>
+            ))
+    }
+
     return (
         <div style={{ width: '100%', height: '170px', 
                       border:'.2rem solid #ececec', borderRadius: '4px', 
@@ -111,21 +129,28 @@ function MessageHeader({handleSearchChange}) {
                     </InputGroup>
                     </Col>
                 </Row>
-               <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem'}}>
-                <Image src ="" /> {` ${user && user.displayName}`}
-               </div>
+
+                {!isPrivateChatRoom &&  
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem'}}>
+                    <Image src={chatRoom && chatRoom.createBy.image} 
+                           roundedCircle
+                           style={{ marginRight: '2px'}}
+                           width={24} height={24} />
+                    {chatRoom && chatRoom.createBy.name}
+               </div>}              
+
                 <Row>
                     <Col>
                         <Accordion>
                             <Card>
                                 <Card.Header style={{ padding: '0 0.5rem' }}>
                                     <Accordion.Toggle as={Button} variant="link" eventKey="0" 
-                                                      style={{ backgroundColor:'transparent', color: 'black'}}>
-                                        Click me!
+                                                      style={{ backgroundColor:'transparent', color: 'black', width:'100%'}}>
+                                    방 설명
                                     </Accordion.Toggle>
                                 </Card.Header>
                                 <Accordion.Collapse eventKey="0">
-                                    <Card.Body>Hello! I'm the body</Card.Body>
+                                    <Card.Body>{chatRoom && chatRoom.description}</Card.Body>
                                 </Accordion.Collapse>
                             </Card>
                         </Accordion>
@@ -136,11 +161,11 @@ function MessageHeader({handleSearchChange}) {
                                 <Card.Header style={{ padding: '0 1rem' }}>
                                     <Accordion.Toggle as={Button} variant="link" eventKey="0"
                                                       style={{ backgroundColor:'transparent', color: 'black'}}>
-                                        Click me!
+                                    참가 유저의 채팅 수
                                     </Accordion.Toggle>
                                 </Card.Header>
                                 <Accordion.Collapse eventKey="0">
-                                    <Card.Body>Hello! I'm the body</Card.Body>
+                                    <Card.Body>{userPosts && renderUserPosts(userPosts)}</Card.Body>
                                 </Accordion.Collapse>
                             </Card>
                         </Accordion>
