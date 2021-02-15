@@ -6,6 +6,7 @@ import Message from './Message'
 import { connect } from 'react-redux';
 import { setUserPosts } from '../../../redux/actions/chat_action';
 
+import Skeleton from '../../../commons/components/Skeleton';
 import firebase from '../../../firebase';
 
 export class MainPanel extends Component {
@@ -156,9 +157,17 @@ export class MainPanel extends Component {
             <span>{user.name}님이 채팅을 입력중입니다...</span>
         ))
 
+        renderMessageSkeleton = loading => 
+            loading && (
+                <>
+                    {[...Array(7)].map((undefine,i) => <Skeleton key={i}/>)}
+                </>
+            )
+        
+
     render() {
 
-        const { messages, searchTerm, searchResults, typingUsers } = this.state;
+        const { messages, searchTerm, searchResults, typingUsers, messagesLoading } = this.state;
         return (
             <div style = {{ padding: '2rem 2rem 0 2rem'}}>
                 <MessageHeader handleSearchChange={this.handleSearchChange} />
@@ -171,7 +180,7 @@ export class MainPanel extends Component {
                     marginBottom: '1rem',
                     overflowY: 'auto'
                 }}>
-
+                    {this.renderMessageSkeleton(messagesLoading)}
                     {searchTerm ? this.renderMessages(searchResults) : this.renderMessages(messages)}
                     {this.renderTypingUsers(typingUsers)}
                     <div ref={node => (this.messageEndRef = node)}/>
