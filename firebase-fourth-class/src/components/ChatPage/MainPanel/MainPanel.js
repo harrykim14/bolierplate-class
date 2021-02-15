@@ -10,6 +10,8 @@ import firebase from '../../../firebase';
 
 export class MainPanel extends Component {
 
+    messageEndRef = React.createRef()
+
     state = {
         messages: [],
         messagesRef: firebase.database().ref("messages"),
@@ -22,10 +24,15 @@ export class MainPanel extends Component {
         listenerLists : []
     }
 
+    componentDidUpdate() {
+        if(this.messageEndRef) {
+            this.messageEndRef.scrollIntoView({ behavior: "smooth" })
+            // Element 인터페이스의 scrollIntoView() 메소드는 scrollIntoView()가 호출 된 요소가 사용자에게 표시되도록 요소의 상위 컨테이너를 스크롤합니다.
+        }
+    }
+
     componentDidMount() {
-
         const { chatRoom } = this.props;
-
         if(chatRoom){
             this.addMessagesListeners(chatRoom.id);
             this.addTypingListeners(chatRoom.id);
@@ -167,6 +174,7 @@ export class MainPanel extends Component {
 
                     {searchTerm ? this.renderMessages(searchResults) : this.renderMessages(messages)}
                     {this.renderTypingUsers(typingUsers)}
+                    <div ref={node => (this.messageEndRef = node)}/>
                 </div>
                 <MessageForm handleSearchChange={this.handleSearchChange} />
             </div>
