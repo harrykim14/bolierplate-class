@@ -145,7 +145,7 @@ function MessageHeader({handleSearchChange}) {
                             <Card>
                                 <Card.Header style={{ padding: '0 0.5rem' }}>
                                     <Accordion.Toggle as={Button} variant="link" eventKey="0" 
-                                                      style={{ backgroundColor:'transparent', color: 'black', width:'100%'}}>
+                                                      style={{ backgroundColor:'transparent', color: 'black', margin:'0'}}>
                                     방 설명
                                     </Accordion.Toggle>
                                 </Card.Header>
@@ -158,9 +158,9 @@ function MessageHeader({handleSearchChange}) {
                     <Col>
                         <Accordion>
                             <Card>
-                                <Card.Header style={{ padding: '0 1rem' }}>
+                                <Card.Header style={{ padding: '0 0.5rem' }}>
                                     <Accordion.Toggle as={Button} variant="link" eventKey="0"
-                                                      style={{ backgroundColor:'transparent', color: 'black'}}>
+                                                      style={{ backgroundColor:'transparent', color: 'black', margin:'0'}}>
                                     참가 유저의 채팅 수
                                     </Accordion.Toggle>
                                 </Card.Header>
